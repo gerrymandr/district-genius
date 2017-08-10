@@ -16,7 +16,7 @@ html
         .col-sm-12
           .pull-right.user-profile-stuff
             if currentUser._id
-              strong Username
+              strong= currentUser.username
               span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               a(href="/logout") Log Out
             else

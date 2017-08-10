@@ -35,8 +35,25 @@ app.use(session({
   saveUninitialized: false
 }));
 
+/* for use in testing only */
+function passThrough(req, res, next) {
+  if (typeof global.it === 'function') {
+    if (req.method === 'POST') {
+      next();
+    } else {
+      return csrfProtection(req, res, next);
+    }
+  } else {
+    throw 'passThrough happening in production';
+  }
+}
+const middleware = ((typeof global.it === 'function') ? passThrough : csrfProtection);
+
+// user registration and management
+require('./login')(app, middleware);
+
 // main page / maps page
-app.get('/', csrfProtection, (req, res) => {
+app.get('/', middleware, (req, res) => {
   res.render('index', {
     csrfToken: req.csrfToken(),
     currentUser: (req.user || {})
@@ -44,7 +61,7 @@ app.get('/', csrfProtection, (req, res) => {
 });
 
 // saving a comment (for known users)
-app.post('/comment', csrfProtection, (req, res) => {
+app.post('/comment', middleware, (req, res) => {
   User.findById(req.user_id, (err, user) => {
     if (err) {
       return res.json(err);
