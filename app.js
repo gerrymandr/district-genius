@@ -10,8 +10,9 @@ const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
 // data models
-const User = require('./models/user.js');
-const Comment = require('./models/comment.js');
+const User = require('./models/user');
+const Comment = require('./models/comment');
+const Map = require('./models/map');
 
 // MongoDB connection
 console.log('Connecting to MongoDB (required)');
@@ -54,19 +55,12 @@ require('./login')(app, middleware);
 
 // main page / maps page
 app.get('/', middleware, (req, res) => {
-  res.render('index', {
-    csrfToken: req.csrfToken(),
-    currentUser: (req.user || {}),
-    comments: []
-  });
-});
-
-app.get('/comments', middleware, (req, res) => {
   Comment.find({}, (err, comments) => {
     res.render('index', {
       csrfToken: req.csrfToken(),
       currentUser: (req.user || {}),
-      comments: comments
+      comments: [],
+      mapID: '598cca5e52d68740f8e6eb3e'
     });
   });
 });
@@ -87,7 +81,8 @@ app.get('/comments/:mapid', middleware, (req, res) => {
       res.render('index', {
         csrfToken: req.csrfToken(),
         currentUser: (req.user || {}),
-        comments: comments
+        comments: comments,
+        mapID: req.params.mapid
       });
     });
   });
@@ -111,7 +106,9 @@ app.post('/comment', middleware, (req, res) => {
       user: user.username,
       user_id: req.body.user_id,
       created: new Date(),
-      updated: new Date()
+      updated: new Date(),
+      test: false,
+      mapID: req.body.mapID
     });
     d.save((err) => {
       if (err) {
@@ -119,6 +116,38 @@ app.post('/comment', middleware, (req, res) => {
       }
       res.json(d);
     });
+  });
+});
+
+// admin upload of files concept
+var admins = ['aaa', 'mapmeld'];
+app.get('/upload', middleware, (req, res) => {
+  if (admins.indexOf(req.user.username) === -1) {
+    return res.json({ error: 'user is not admin - work in progress' });
+  }
+  res.render('upload', {
+    csrfToken: req.csrfToken()
+  });
+});
+
+app.post('/upload', middleware, (req, res) => {
+  if (admins.indexOf(req.user.username) === -1) {
+    return res.json({ error: 'user is not admin - work in progress' });
+  }
+  var m = new Map({
+    name: 'Test',
+    locality: 'Philadelphia',
+    organizer: 'MGGG',
+    created: new Date(),
+    updated: new Date(),
+    files: 'dunno',
+    test: false
+  });
+  m.save((err) => {
+    if (err) {
+      return res.json(err);
+    }
+    res.redirect('/comments/' + m._id);
   });
 });
 

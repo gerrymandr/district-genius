@@ -6,7 +6,8 @@ const mapSchema = mongoose.Schema({
   organizer: String,
   created: Date,
   updated: Date,
-  files: String
+  files: String,
+  test: Boolean
 });
 
 module.exports = mongoose.model('Map', mapSchema);

@@ -32,3 +32,12 @@ textarea {
 .user-profile-stuff {
   margin-top: 25px;
 }
+
+.clearfix {
+  clear: both;
+}
+
+path[stroke="purple"] {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}

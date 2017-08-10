@@ -92,8 +92,7 @@ $(function() {
   map.on(L.Draw.Event.CREATED, function (e) {
     // console.log(e.layer);
     var clip;
-    for (var i = 0; i < district_lines.length; i++) {
-      var district_line = district_lines[i];
+    district_lines.map(function(district_line) {
       if (e.layer.options.radius) {
         clip = turf.intersect(district_line, circle);
         console.log('circle at ' + e.layer.getLatLng() + ' with radius ' + e.layer.options.radius);
@@ -105,9 +104,11 @@ $(function() {
         var north = e.layer.getBounds().getNorthEast().lat;
 
         clip = turf.bboxClip(district_line, [west, south, east, north]);
-        console.log('rectangle with bounds ' + e.layer.getBounds());
       }
-      if (clip) {
+
+      if (clip.geometry.coordinates.length) {
+        // overlapped the border
+
         if (highlight) {
           map.removeLayer(highlight);
         }
@@ -122,12 +123,17 @@ $(function() {
         // only one intersect needed?
         // break;
       }
-    }
+    });
   });
 });
 
 function generatePopup(district_geo) {
   // very basic code for making a comment type thing
+
+  if (!($('#user_id').val())) {
+    return 'Please <a href="/login">log in</a> to make a comment...';
+  }
+
   var outer = $('<div>');
   var blurb = $('<form>')
     .attr('class', 'comment-form')
@@ -137,6 +143,11 @@ function generatePopup(district_geo) {
     .attr('type', 'hidden')
     .attr('name', '_csrf')
     .val($('#csrf').val())
+  );
+  blurb.append($('<input>')
+    .attr('type', 'hidden')
+    .attr('name', 'mapID')
+    .val($('#mapID').val())
   );
   blurb.append($('<input>')
     .attr('type', 'hidden')
@@ -154,9 +165,12 @@ function generatePopup(district_geo) {
     .attr('rows', 4)
   );
   blurb.append($('<input>')
-    .attr('class', 'btn btn-primary')
+    .attr('class', 'btn btn-primary pull-right')
     .attr('type', 'submit')
     .val('Post')
+  );
+  blurb.append($('<div>')
+    .attr('class', 'clearfix')
   );
   outer.append(blurb);
   return outer.html();

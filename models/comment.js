@@ -7,7 +7,8 @@ const commentSchema = mongoose.Schema({
   updated: Date,
   user: String,
   user_id: String,
-  mapID: String
+  mapID: String,
+  test: Boolean
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

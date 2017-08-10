@@ -11,6 +11,7 @@ html
   body
     input#csrf(type="hidden", value=csrfToken)
     input#user_id(type="hidden", value=currentUser._id)
+    input#mapID(type="hidden", value=mapID)
     .container
       .row
         .col-sm-12
@@ -29,6 +30,15 @@ html
       .row
         .col-sm-12
           #map
+          br
+          br
+      .row
+        .col-sm-4
+          a.btn.btn-success(href="/find") Find a District
+        .col-sm-4
+          a.btn.btn-success(href="/upload") Upload a District
+        .col-sm-4
+          a.btn.btn-success(href="/") ???
 
     script(src="//unpkg.com/leaflet@1.2.0/dist/leaflet.js")
     script(src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.10/leaflet.draw.js")
