@@ -11,7 +11,7 @@ const csrfProtection = csrf({ cookie: true });
 
 // data models
 const User = require('./models/user.js');
-const District = require('./models/district.js');
+const Comment = require('./models/comment.js');
 
 // MongoDB connection
 console.log('Connecting to MongoDB (required)');
@@ -56,13 +56,47 @@ require('./login')(app, middleware);
 app.get('/', middleware, (req, res) => {
   res.render('index', {
     csrfToken: req.csrfToken(),
-    currentUser: (req.user || {})
+    currentUser: (req.user || {}),
+    comments: []
   });
 });
 
+app.get('/comments', middleware, (req, res) => {
+  Comment.find({}, (err, comments) => {
+    res.render('index', {
+      csrfToken: req.csrfToken(),
+      currentUser: (req.user || {}),
+      comments: comments
+    });
+  });
+});
+
+app.get('/comments/:mapid', middleware, (req, res) => {
+  Map.findById(req.params.mapid, (err, map) => {
+    if (err) {
+      return res.json(err);
+    }
+    if (!map) {
+      return res.json({ error: 'no such map' });
+    }
+    Comment.find({ mapID: req.params.mapid }, (err, comments) => {
+      if (err) {
+        return res.json(err);
+      }
+
+      res.render('index', {
+        csrfToken: req.csrfToken(),
+        currentUser: (req.user || {}),
+        comments: comments
+      });
+    });
+  });
+});
+
+
 // saving a comment (for known users)
 app.post('/comment', middleware, (req, res) => {
-  User.findById(req.user_id, (err, user) => {
+  User.findById(req.body.user_id, (err, user) => {
     if (err) {
       return res.json(err);
     }
@@ -71,7 +105,7 @@ app.post('/comment', middleware, (req, res) => {
     }
 
     // make a district item
-    var d = new District({
+    var d = new Comment({
       geo: JSON.parse(req.body.district),
       text: req.body.text,
       user: user.username,

@@ -29,11 +29,6 @@ textarea {
   opacity: 0.6;
 }
 
-path.leaflet-interactive {
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
-}
-
 .user-profile-stuff {
   margin-top: 25px;
 }

@@ -1,3 +1,33 @@
+// Array map polyfill
+if (!Array.prototype.map) {
+  Array.prototype.map = function(callback/*, thisArg*/) {
+    var T, A, k;
+    if (this == null) {
+      throw new TypeError('this is null or not defined');
+    }
+    var O = Object(this);
+    var len = O.length >>> 0;
+    if (typeof callback !== 'function') {
+      throw new TypeError(callback + ' is not a function');
+    }
+    if (arguments.length > 1) {
+      T = arguments[1];
+    }
+    A = new Array(len);
+    k = 0;
+    while (k < len) {
+      var kValue, mappedValue;
+      if (k in O) {
+        kValue = O[k];
+        mappedValue = callback.call(T, kValue, k, O);
+        A[k] = mappedValue;
+      }
+      k++;
+    }
+    return A;
+  };
+}
+
 $(function() {
   var highlight;
 
@@ -38,13 +68,24 @@ $(function() {
 
     if (data.geometry.type === 'MultiPolygon') {
       // multiple polygon areas
-      for (var i = 0; i < data.geometry.coordinates.length; i++) {
-        addBorderSegment(data.geometry.coordinates[i][0]);
-      }
+      data.geometry.coordinates.map(function (polygon) {
+        addBorderSegment(polygon[0]);
+      });
     } else {
       // regular polygon -> polyline
       addBorderSegment(data.geometry.coordinates[0]);
     }
+
+    // add the comments over the border
+    comments.map(function (comment) {
+      L.geoJson(comment.geo, {
+          style: function(feature) {
+            return { weight: 8, color: 'red' };
+          }
+        })
+        .bindPopup(textOfComment(comment))
+        .addTo(map);
+    });
   });
 
   // Leaflet Draw toolbar
@@ -99,7 +140,8 @@ function generatePopup(district_geo) {
   );
   blurb.append($('<input>')
     .attr('type', 'hidden')
-    .attr('user_id', $('#user_id').val()));
+    .attr('name', 'user_id')
+    .attr('value', $('#user_id').val()));
   blurb.append($('<input>')
     .attr('type', 'hidden')
     .attr('name', 'district')
@@ -135,4 +177,8 @@ function makeBounds(coordinates, existing) {
     }
   }
   return existing;
+}
+
+function textOfComment(comment) {
+  return comment.text + '<br/>by <strong>' + comment.user + '</strong>';
 }
