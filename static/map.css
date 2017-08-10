@@ -1,0 +1,39 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  height: 80%;
+  height: 80vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.comment-form {
+  width: 300px;
+}
+
+textarea {
+  font-size: 14pt;
+}
+
+.leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-marker {
+  display: none !important;
+}
+
+.leaflet-tile-pane {
+  opacity: 0.6;
+}
+
+path.leaflet-interactive {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+.user-profile-stuff {
+  margin-top: 25px;
+}
