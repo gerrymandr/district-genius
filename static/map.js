@@ -60,6 +60,7 @@ $(function() {
         color: 'purple'
       }).addTo(map);
 
+      // trying to avoid contaminating coordinate-order between these two things
       var ptlist = [].concat(ptlist).map(function(coordinate) {
         return coordinate.reverse();
       });
@@ -77,6 +78,7 @@ $(function() {
     }
 
     // add the comments over the border
+    var centroids = [];
     comments.map(function (comment) {
       L.geoJson(comment.geo, {
           style: function(feature) {
@@ -85,7 +87,11 @@ $(function() {
         })
         .bindPopup(textOfComment(comment))
         .addTo(map);
+      var centroid = turf.centroid(comment.geo).geometry.coordinates;
+      centroids.push([centroid[1], centroid[0], (comment.text || "abcdefg").length]);
     });
+
+    L.heatLayer(centroids, {radius: 25}).addTo(map);
   });
 
   // Leaflet Draw toolbar
