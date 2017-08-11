@@ -1,0 +1,4 @@
+[submodule "static/2016-congressional-districts"]
+	path = static/2016-congressional-districts
+	url = https://github.com/Schwanksta/2016-congressional-districts.git
+	branch = master
