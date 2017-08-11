@@ -6,6 +6,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const compression = require('compression');
 const mongoose = require('mongoose');
+const request = require('request');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
@@ -62,6 +63,23 @@ app.get('/', middleware, (req, res) => {
       comments: [],
       map: { _id: 'PA-1', state: 'PA', district: 1 }
     });
+  });
+});
+
+app.post('/find', middleware, (req, res) => {
+  request("https://www.googleapis.com/civicinfo/v2/voterinfo?electionId=2000&key=" + process.env.API_KEY + "&address=" + req.body.address, (err, resp, body) => {
+    if (err) {
+      return res.json(err);
+    }
+    var jbod = JSON.parse(body);
+    for (var c = 0; c < jbod.contests.length; c++) {
+      if ((jbod.contests[c].office.indexOf('Representative in Congress') > -1) || (jbod.contests[c].office.indexOf('US Representative') > -1)) {
+        var code = jbod.contests[c].district.id.split('/');
+        var state = code[2].split(':')[1];
+        var dnum = (code.length === 3) ? 0 : code[3].split(':')[1];
+        return res.redirect('/map/' + state.toUpperCase() + '-' + dnum);
+      }
+    }
   });
 });
 
