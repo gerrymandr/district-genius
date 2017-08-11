@@ -77,7 +77,7 @@ app.post('/find', middleware, (req, res) => {
     }
     try {
       for (var c = 0; c < jbod.contests.length; c++) {
-        if ((jbod.contests[c].office.indexOf('Representative in Congress') > -1) || (jbod.contests[c].office.indexOf('US Representative') > -1) || (jbod.contests[c].office.indexOf('U.S. Representative') > -1)) {
+        if (jbod.contests[c].roles[0] === 'legislatorLowerBody') {
           var code = jbod.contests[c].district.id.split('/');
           var state = code[2].split(':')[1];
           var dnum = (code.length === 3) ? 0 : code[3].split(':')[1];
