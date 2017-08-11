@@ -83,7 +83,10 @@ $(function() {
     comments.map(function (comment) {
       L.geoJson(comment.geo, {
           style: function(feature) {
-            return { weight: 8, color: 'red', interactive: false };
+            var r = 0;
+            var g = 30 + Math.floor(120 * Math.random());
+            var b = 128 + Math.floor(120 * Math.random());
+            return { weight: 8, color: 'rgb(' + [r, g, b].join(',') + ')', interactive: false, opacity: 0.7 };
           }
         })
         .addTo(map);
