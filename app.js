@@ -138,14 +138,7 @@ app.get('/map/:mapid', middleware, (req, res) => {
 
 // saving a comment (for known users)
 app.post('/comment', middleware, (req, res) => {
-  User.findById(req.body.user_id, (err, user) => {
-    if (err) {
-      return res.json(err);
-    }
-    if (!user) {
-      return res.json({ error: 'no user' });
-    }
-
+  function madeComment(user) {
     // make a district item
     var d = new Comment({
       geo: JSON.parse(req.body.district),
@@ -163,7 +156,21 @@ app.post('/comment', middleware, (req, res) => {
       }
       res.json(d);
     });
-  });
+  }
+
+  if (req.user) {
+    User.findById(req.body.user_id, (err, user) => {
+      if (err) {
+        return res.json(err);
+      }
+      if (!user) {
+        return res.json({ error: 'no user' });
+      }
+      madeComment(user);
+    });
+  } else {
+    madeComment({ username: 'anonymous' });
+  }
 });
 
 // admin upload of files concept
