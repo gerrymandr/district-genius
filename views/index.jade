@@ -26,23 +26,25 @@ html
               a(href="/login") Log In
               span &nbsp;|&nbsp;
               a(href="/register") Register
-          h3 District Genius
+          h3.title District Genius
+          form.form-inline(action="/find", method="POST")
+            input(type="hidden", name="_csrf", value=csrfToken)
+            .form-group
+              input.form-control(type="text", name="address", placeholder="Address")
+              input.btn.btn-success(type="submit", value="Find my District")
       .row
         .col-sm-12
           #map
           br
           br
       .row
-        .col-sm-4
-          form.form(action="/find", method="POST")
-            input(type="hidden", name="_csrf", value=csrfToken)
-            .form-group
-              input.form-control.x-input-large(type="text", name="address", placeholder="Address")
-              input.btn.btn-success(type="submit", value="Find my District")
-        .col-sm-4
-          a.btn.btn-success(href="/upload") Upload a District
-        .col-sm-4
-          a.btn.btn-success(href="/") ???
+        //
+          .col-sm-4
+
+          .col-sm-4
+            a.btn.btn-success(href="/upload") Upload a District
+          .col-sm-4
+            a.btn.btn-success(href="/") ???
 
     script(src="//unpkg.com/leaflet@1.2.0/dist/leaflet.js")
     script(src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.10/leaflet.draw.js")

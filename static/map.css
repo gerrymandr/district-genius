@@ -5,12 +5,17 @@ html, body {
   padding: 0;
 }
 
+body {
+  padding-top: 20px;
+}
+
 #map {
   height: 80%;
   height: 80vh;
   width: 100%;
   margin: 0;
   padding: 0;
+  margin-top: 10px;
 }
 
 .comment-form {
@@ -30,7 +35,7 @@ textarea {
 }
 
 .user-profile-stuff {
-  margin-top: 25px;
+  margin-top: 8px;
 }
 
 .clearfix {
@@ -40,4 +45,16 @@ textarea {
 path[stroke="purple"] {
   cursor: -webkit-grab;
   cursor: -moz-grab;
+}
+
+h3.title, form.form-inline {
+  display: inline;
+}
+
+form.form-inline {
+  margin-left: 30px;
+}
+
+form.form-inline input.form-control {
+  margin-right: 10px;
 }
