@@ -56,11 +56,11 @@ require('./login')(app, middleware);
 
 // main page / maps page
 app.get('/', middleware, (req, res) => {
-  Comment.find({}, (err, comments) => {
+  Comment.find({ mapID: '598dbcf59f755e00117f9c3d' }, (err, comments) => {
     res.render('index', {
       csrfToken: req.csrfToken(),
       currentUser: (req.user || {}),
-      comments: [],
+      comments: comments,
       map: { _id: '598dbcf59f755e00117f9c3d', state: 'PA', district: 1 }
     });
   });
