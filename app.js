@@ -60,20 +60,49 @@ app.get('/', middleware, (req, res) => {
       csrfToken: req.csrfToken(),
       currentUser: (req.user || {}),
       comments: [],
-      mapID: '598cca5e52d68740f8e6eb3e'
+      map: { _id: 'PA-1', state: 'PA', district: 1 }
     });
   });
 });
 
-app.get('/comments/:mapid', middleware, (req, res) => {
-  Map.findById(req.params.mapid, (err, map) => {
+app.get('/map/:mapid', middleware, (req, res) => {
+  var finder = {};
+  if (req.params.mapid.indexOf('-') > -1) {
+    // STATE-DISTRICT num, PA-1, AK-0
+    finder.state = req.params.mapid.split('-')[0].toUpperCase();
+    finder.district = req.params.mapid.split('-')[1] * 1;
+  } else {
+    // direct finder
+    finder._id = req.params.mapid;
+  }
+  Map.findOne(finder, (err, map) => {
     if (err) {
       return res.json(err);
     }
     if (!map) {
+      if (req.params.mapid.indexOf('-') > -1) {
+        // just make the standard district map
+        var m = new Map({
+          name: req.params.mapid.toUpperCase(),
+          locality: req.params.mapid.toUpperCase(),
+          organizer: 'MGGG',
+          created: new Date(),
+          updated: new Date(),
+          test: false,
+          state: finder.state,
+          district: finder.district
+        });
+        m.save((err) => {
+          if (err) {
+            return res.json(err);
+          }
+          res.redirect('/map/' + req.params.mapid + '')
+        });
+        return;
+      }
       return res.json({ error: 'no such map' });
     }
-    Comment.find({ mapID: req.params.mapid }, (err, comments) => {
+    Comment.find({ mapID: map._id }, (err, comments) => {
       if (err) {
         return res.json(err);
       }
@@ -82,7 +111,7 @@ app.get('/comments/:mapid', middleware, (req, res) => {
         csrfToken: req.csrfToken(),
         currentUser: (req.user || {}),
         comments: comments,
-        mapID: req.params.mapid
+        map: map
       });
     });
   });

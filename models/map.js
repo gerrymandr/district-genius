@@ -7,7 +7,9 @@ const mapSchema = mongoose.Schema({
   created: Date,
   updated: Date,
   files: String,
-  test: Boolean
+  test: Boolean,
+  state: String,
+  district: Number
 });
 
 module.exports = mongoose.model('Map', mapSchema);

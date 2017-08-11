@@ -11,7 +11,7 @@ html
   body
     input#csrf(type="hidden", value=csrfToken)
     input#user_id(type="hidden", value=currentUser._id)
-    input#mapID(type="hidden", value=mapID)
+    input#mapID(type="hidden", value=map._id)
     .container
       .row
         .col-sm-12
@@ -44,5 +44,5 @@ html
     script(src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.10/leaflet.draw.js")
     script(src="//npmcdn.com/@turf/turf@4.6.1/turf.min.js")
     script(src="//code.jquery.com/jquery-3.2.1.min.js", integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=", crossorigin="anonymous")
-    script var comments = !{JSON.stringify(comments)};
+    script var comments = !{JSON.stringify(comments)}; var state = !{JSON.stringify(map.state)}; var dnum = !{JSON.stringify(map.district)};
     script(src="/map.js")

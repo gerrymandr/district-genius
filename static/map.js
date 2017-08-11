@@ -44,7 +44,7 @@ $(function() {
 
   // hard-coded one GeoJSON district
   var district_lines = [];
-  $.getJSON('/geojson/pa-1.geojson', function(data) {
+  $.getJSON('/2016-congressional-districts/' + state.toUpperCase() + '-' + dnum + '/shape.geojson', function(data) {
     var coordinates = data.geometry.coordinates;
     var bounds = makeBounds(coordinates);
     map.fitBounds(L.latLngBounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]]));
