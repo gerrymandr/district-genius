@@ -135,7 +135,7 @@ $(function() {
     });
   });
 
-  // click to see nearby comments
+  // click to see a list of nearby comments
   map.on('click', function(e) {
     var pt = turf.point([e.latlng.lng, e.latlng.lat]);
     var buffer = turf.buffer(pt, 6, 'miles');
@@ -146,7 +146,9 @@ $(function() {
         includedComments.push(textOfComment(comment));
       }
     });
-    map.openPopup(includedComments.join('<hr/>'), e.latlng);
+    if (includedComments.length) {
+      map.openPopup(includedComments.join('<hr/>'), e.latlng);
+    }
   });
 });
 
