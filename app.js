@@ -61,7 +61,7 @@ app.get('/', middleware, (req, res) => {
       csrfToken: req.csrfToken(),
       currentUser: (req.user || {}),
       comments: [],
-      map: { _id: 'PA-1', state: 'PA', district: 1 }
+      map: { _id: '598dbcf59f755e00117f9c3d', state: 'PA', district: 1 }
     });
   });
 });
