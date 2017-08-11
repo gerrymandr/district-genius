@@ -42,12 +42,13 @@ textarea {
   clear: both;
 }
 
-path[stroke="red"] {
+path {
   pointer-events: stroke !important;
   cursor: pointer;
 }
 
 path[stroke="purple"] {
+  pointer-events: none !important;
   cursor: -webkit-grab;
   cursor: -moz-grab;
 }

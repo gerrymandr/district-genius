@@ -137,11 +137,12 @@ $(function() {
 
   // click to see a list of nearby comments
   map.on('click', function(e) {
+    var zoomFactor = Math.pow(2, 8 - map.getZoom());
     var pt = turf.point([e.latlng.lng, e.latlng.lat]);
-    var buffer = turf.buffer(pt, 6, 'miles');
+    var buffer = turf.buffer(pt, 6 * zoomFactor, 'miles');
     var includedComments = [];
     comments.map(function(comment) {
-      var cmtbuffer = turf.buffer(comment.geo, 1, 'miles');
+      var cmtbuffer = turf.buffer(comment.geo, zoomFactor, 'miles');
       if (turf.intersect(cmtbuffer, buffer)) {
         includedComments.push(textOfComment(comment));
       }
