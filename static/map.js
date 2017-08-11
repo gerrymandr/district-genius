@@ -28,10 +28,10 @@ if (!Array.prototype.map) {
   };
 }
 
-$(function() {
-  var highlight;
+var highlight, map;
 
-  var map = L.map('map', {
+$(function() {
+  map = L.map('map', {
       drawControl: true
     })
     .setView([39.9603624, -75.2717938], 13);
@@ -127,53 +127,53 @@ $(function() {
   });
 });
 
+var comment_geo;
 function generatePopup(district_geo) {
   // very basic code for making a comment type thing
 
+  /*
   if (!($('#user_id').val())) {
     return 'Please <a href="/login">log in</a> to make a comment...';
   }
+  */
 
-  var outer = $('<div>');
-  var blurb = $('<form>')
-    .attr('class', 'comment-form')
-    .attr('method', 'POST')
-    .attr('action', '/comment');
-  blurb.append($('<input>')
-    .attr('type', 'hidden')
-    .attr('name', '_csrf')
-    .val($('#csrf').val())
-  );
-  blurb.append($('<input>')
-    .attr('type', 'hidden')
-    .attr('name', 'mapID')
-    .val($('#mapID').val())
-  );
-  blurb.append($('<input>')
-    .attr('type', 'hidden')
-    .attr('name', 'user_id')
-    .attr('value', $('#user_id').val()));
-  blurb.append($('<input>')
-    .attr('type', 'hidden')
-    .attr('name', 'district')
-    .val(JSON.stringify(district_geo.geometry))
-  );
+  comment_geo = district_geo.geometry;
+
+  var blurb = $('<div>')
+    .attr('class', 'comment-form');
   blurb.append($('<h4>').text('Make a Comment'));
   blurb.append($('<textarea>')
-    .attr('class', 'form-control')
+    .attr('class', 'form-control my-comment')
     .attr('name', 'text')
     .attr('rows', 4)
   );
-  blurb.append($('<input>')
+  blurb.append($('<button>')
     .attr('class', 'btn btn-primary pull-right')
-    .attr('type', 'submit')
-    .val('Post')
+    .text('Post')
+    .attr('onclick', 'submitCommentForm()')
   );
   blurb.append($('<div>')
     .attr('class', 'clearfix')
   );
+  var outer = $('<div>');
   outer.append(blurb);
   return outer.html();
+}
+
+function submitCommentForm() {
+  $('.comment-form button').attr('disabled', 'disabled');
+  var origText = $('textarea.my-comment').val();
+  return $.post('/comment', {
+    _csrf: $('#csrf').val(),
+    user_id: $('#user_id').val(),
+    mapID: $('#mapID').val(),
+    district: JSON.stringify(comment_geo),
+    text: origText
+  }, function (response) {
+    highlight.closePopup();
+    highlight.unbindPopup();
+    highlight.bindPopup('<strong>You made this comment:</strong><br/>' + origText);
+  });
 }
 
 function makeBounds(coordinates, existing) {
