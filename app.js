@@ -75,14 +75,17 @@ app.post('/find', middleware, (req, res) => {
     if (!jbod.contests || !jbod.contests.length) {
       return res.json({ error: 'I don\'t know that address.' });
     }
-    for (var c = 0; c < jbod.contests.length; c++) {
-      if ((jbod.contests[c].office.indexOf('Representative in Congress') > -1) || (jbod.contests[c].office.indexOf('US Representative') > -1)) {
-        var code = jbod.contests[c].district.id.split('/');
-        var state = code[2].split(':')[1];
-        var dnum = (code.length === 3) ? 0 : code[3].split(':')[1];
-        return res.redirect('/map/' + state.toUpperCase() + '-' + dnum);
+    try {
+      for (var c = 0; c < jbod.contests.length; c++) {
+        if ((jbod.contests[c].office.indexOf('Representative in Congress') > -1) || (jbod.contests[c].office.indexOf('US Representative') > -1) || (jbod.contests[c].office.indexOf('U.S. Representative') > -1)) {
+          var code = jbod.contests[c].district.id.split('/');
+          var state = code[2].split(':')[1];
+          var dnum = (code.length === 3) ? 0 : code[3].split(':')[1];
+          return res.redirect('/map/' + state.toUpperCase() + '-' + dnum);
+        }
       }
-    }
+    } catch(e){ }
+    return res.json({ error: 'I understand that address, but it might not be specific enough to know your Representative. Please try again with: house number, street, city, state.' });
   });
 });
 
