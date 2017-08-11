@@ -135,6 +135,12 @@ app.get('/map/:mapid', middleware, (req, res) => {
   });
 });
 
+// list of recent comments
+app.get('/comments', (req, res) => {
+  Comment.find({}).select('text user mapID created').sort('-created').limit(10).exec((err, comments) => {
+    return res.json(err || comments);
+  });
+});
 
 // saving a comment (for known users)
 app.post('/comment', middleware, (req, res) => {
