@@ -18,6 +18,11 @@ body {
   margin-top: 10px;
 }
 
+/* lighten map tiles so they aren't as obtrusive - district and comments must stand out */
+.leaflet-tile-pane {
+  opacity: 0.5;
+}
+
 .comment-form {
   width: 300px;
 }
@@ -26,12 +31,9 @@ textarea {
   font-size: 14pt;
 }
 
-.leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-marker {
+/* remove these buttons from the map tools */
+.leaflet-draw-draw-circle, .leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-marker {
   display: none !important;
-}
-
-.leaflet-tile-pane {
-  opacity: 0.5;
 }
 
 .user-profile-stuff {
@@ -42,17 +44,7 @@ textarea {
   clear: both;
 }
 
-path {
-  pointer-events: stroke !important;
-  cursor: pointer;
-}
-
-path[stroke="purple"] {
-  pointer-events: none !important;
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
-}
-
+/* top title and searchbar */
 h3.title, form.form-inline {
   display: inline;
 }
@@ -63,4 +55,18 @@ form.form-inline {
 
 form.form-inline input.form-control {
   margin-right: 10px;
+}
+
+/* we want the comment lines to LOOK clickable, but actually the
+click passes to the map, which searches all comment geometries */
+path {
+  pointer-events: stroke !important;
+  cursor: pointer;
+}
+
+/* make district border look unclickable */
+path[stroke="purple"] {
+  pointer-events: none !important;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
 }

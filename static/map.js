@@ -1,4 +1,4 @@
-// Array map polyfill
+// Array map polyfill for old browsers
 if (!Array.prototype.map) {
   Array.prototype.map = function(callback/*, thisArg*/) {
     var T, A, k;
@@ -35,6 +35,8 @@ $(function() {
       drawControl: true
     })
     .setView([39.9603624, -75.2717938], 13);
+
+  // remove Leaflet link
   map.attributionControl.setPrefix('');
 
   // Humanitarian OSM layer?
@@ -48,10 +50,6 @@ $(function() {
     var coordinates = data.geometry.coordinates;
     var bounds = makeBounds(coordinates);
     map.fitBounds(L.latLngBounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]]));
-
-    // a district might be a Polygon or MultiPolygon
-    // there are no holes in districts (I think?) so we should only be worried about one outer ring of the Polygon
-    // we are rendering the district as a LineString so that we can do the TurfJS clip thing
 
     function addBorderSegment(ptlist) {
       L.polyline(ptlist.map(function(coordinate) {
@@ -68,6 +66,9 @@ $(function() {
       district_lines.push(turf.lineString(ptlist));
     }
 
+    // a district might be a Polygon or MultiPolygon
+    // there are no holes in districts (AFAIK) so we should only be worried about one outer ring of the Polygon
+    // we are handling the district as an array of LineStrings so that we can do the TurfJS clip and get lines back
     if (data.geometry.type === 'MultiPolygon') {
       // multiple polygon areas
       data.geometry.coordinates.map(function (polygon) {
@@ -83,6 +84,7 @@ $(function() {
     comments.map(function (comment) {
       L.geoJson(comment.geo, {
           style: function(feature) {
+            // randomized blue comment line
             var r = 0;
             var g = 30 + Math.floor(120 * Math.random());
             var b = 128 + Math.floor(120 * Math.random());
@@ -90,23 +92,28 @@ $(function() {
           }
         })
         .addTo(map);
+
+      // if there is no text in the comment, give it a minimum value
+      // where should the heatmap render this? the centroid? the midpoint on the line?
       var centroid = turf.centroid(comment.geo).geometry.coordinates;
       centroids.push([centroid[1], centroid[0], (comment.text || "abcdefg").length]);
     });
 
+    // use heatmap plugin
     L.heatLayer(centroids, {radius: 25}).addTo(map);
   });
 
   // Leaflet Draw toolbar
   map.on(L.Draw.Event.CREATED, function (e) {
-    // console.log(e.layer);
     var clip;
     district_lines.map(function(district_line) {
       if (e.layer.options.radius) {
+        // not ready for circle yet
         clip = turf.intersect(district_line, circle);
         console.log('circle at ' + e.layer.getLatLng() + ' with radius ' + e.layer.options.radius);
         throw 'not yet supported in clip';
       } else {
+        // do box border
         var west = e.layer.getBounds().getSouthWest().lng;
         var south = e.layer.getBounds().getSouthWest().lat;
         var east = e.layer.getBounds().getNorthEast().lng;
@@ -116,7 +123,7 @@ $(function() {
       }
 
       if (clip.geometry.coordinates.length) {
-        // overlapped the border
+        // successfully overlapped the border
 
         if (highlight) {
           map.removeLayer(highlight);
@@ -129,24 +136,30 @@ $(function() {
         .bindPopup(generatePopup(clip))
         .openPopup();
 
-        // only one intersect needed?
-        // break;
+        // allow multiple intersects (overlapping multipolygon districts)
       }
     });
   });
 
   // click to see a list of nearby comments
   map.on('click', function(e) {
+    // the click-to-hit distance on the map should halve each time we zoom in
+    // at zoom 8, you can click 6-7 miles away from the line
+    // at zoom 9, it's 3-3.5 miles
     var zoomFactor = Math.pow(2, 8 - map.getZoom());
+
     var pt = turf.point([e.latlng.lng, e.latlng.lat]);
     var buffer = turf.buffer(pt, 6 * zoomFactor, 'miles');
     var includedComments = [];
     comments.map(function(comment) {
+      // sometimes a comment geo has only a tiny point, so we add a buffer around it
       var cmtbuffer = turf.buffer(comment.geo, zoomFactor, 'miles');
       if (turf.intersect(cmtbuffer, buffer)) {
         includedComments.push(textOfComment(comment));
       }
     });
+
+    // only open the popup if it found any matches
     if (includedComments.length) {
       map.openPopup(includedComments.join('<hr/>'), e.latlng);
     }
@@ -155,7 +168,7 @@ $(function() {
 
 var comment_geo;
 function generatePopup(district_geo) {
-  // very basic code for making a comment type thing
+  // starter code for making a comment box
 
   /*
   if (!($('#user_id').val())) {
@@ -187,6 +200,7 @@ function generatePopup(district_geo) {
 }
 
 function submitCommentForm() {
+  // AJAX submit of comment
   $('.comment-form button').attr('disabled', 'disabled');
   var origText = $('textarea.my-comment').val();
   return $.post('/comment', {
@@ -202,6 +216,7 @@ function submitCommentForm() {
   });
 }
 
+// get bounds of the district geometry
 function makeBounds(coordinates, existing) {
   if (!existing) {
     existing = [180, 90, -180, -90];
@@ -219,6 +234,7 @@ function makeBounds(coordinates, existing) {
   return existing;
 }
 
+// how comment appears in a list of comments
 function textOfComment(comment) {
   return comment.text + '<br/>by <strong>' + comment.user + '</strong>';
 }
