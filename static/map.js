@@ -236,5 +236,5 @@ function makeBounds(coordinates, existing) {
 
 // how comment appears in a list of comments
 function textOfComment(comment) {
-  return comment.text + '<br/>by <strong>' + comment.user + '</strong>';
+  return comment.text.replace(/\n/g, '<br/>') + '<br/>by <strong>' + comment.user + '</strong>';
 }

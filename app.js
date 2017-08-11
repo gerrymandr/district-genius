@@ -72,6 +72,9 @@ app.post('/find', middleware, (req, res) => {
       return res.json(err);
     }
     var jbod = JSON.parse(body);
+    if (!jbod.contests || !jbod.contests.length) {
+      return res.json({ error: 'I don\'t know that address.' });
+    }
     for (var c = 0; c < jbod.contests.length; c++) {
       if ((jbod.contests[c].office.indexOf('Representative in Congress') > -1) || (jbod.contests[c].office.indexOf('US Representative') > -1)) {
         var code = jbod.contests[c].district.id.split('/');
