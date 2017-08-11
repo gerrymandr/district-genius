@@ -31,7 +31,7 @@ textarea {
 }
 
 .leaflet-tile-pane {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .user-profile-stuff {
@@ -40,6 +40,11 @@ textarea {
 
 .clearfix {
   clear: both;
+}
+
+path[stroke="red"] {
+  pointer-events: stroke !important;
+  cursor: pointer;
 }
 
 path[stroke="purple"] {

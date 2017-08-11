@@ -57,7 +57,8 @@ $(function() {
       L.polyline(ptlist.map(function(coordinate) {
         return coordinate.reverse();
       }), {
-        color: 'purple'
+        color: 'purple',
+        interactive: false
       }).addTo(map);
 
       // trying to avoid contaminating coordinate-order between these two things
@@ -82,10 +83,9 @@ $(function() {
     comments.map(function (comment) {
       L.geoJson(comment.geo, {
           style: function(feature) {
-            return { weight: 8, color: 'red' };
+            return { weight: 8, color: 'red', interactive: false };
           }
         })
-        .bindPopup(textOfComment(comment))
         .addTo(map);
       var centroid = turf.centroid(comment.geo).geometry.coordinates;
       centroids.push([centroid[1], centroid[0], (comment.text || "abcdefg").length]);
@@ -130,6 +130,20 @@ $(function() {
         // break;
       }
     });
+  });
+
+  // click to see nearby comments
+  map.on('click', function(e) {
+    var pt = turf.point([e.latlng.lng, e.latlng.lat]);
+    var buffer = turf.buffer(pt, 6, 'miles');
+    var includedComments = [];
+    comments.map(function(comment) {
+      var cmtbuffer = turf.buffer(comment.geo, 1, 'miles');
+      if (turf.intersect(cmtbuffer, buffer)) {
+        includedComments.push(textOfComment(comment));
+      }
+    });
+    map.openPopup(includedComments.join('<hr/>'), e.latlng);
   });
 });
 
