@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGODB_URI || 'localho
 // more Express server setup
 var app = express();
 app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 app.use(express['static'](__dirname + '/static'));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
